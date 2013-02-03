@@ -1,0 +1,13 @@
+DoGoBoy
+
+Portable Nintendo Game Boy emulator using SDL
+
+DoGoBoy is a portable Nintendo Game Boy emulator written in C and using the popular SDL library for portability. This is very much a work in progress emulator that I started writting back in 2009 to prove to myself I had the skills and resolve to make a working emulator.
+
+I have decided to release this code because it seems a waste to have it gather dust on my hard drive when others might find it useful and secondly I decided to share my knowledge and experience of creating an emulator at a monthly software developer meet up. This code has been improved a little before unloading. I've revisited the code to add comments, break it down into modules, improve the build system and add joypad support.
+
+Known issues:
+- Compatiblity needs a lot of work, there are probably still CPU bugs
+- Limited memory mapping support
+- No sound support
+- No backup memory support
