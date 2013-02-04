@@ -303,7 +303,7 @@ void writeByteToMemory(unsigned int address, byte value)
     // Unusable memory
 	else if ((address >= ADDR_RESERVED1) && (address < ADDR_IO_PORTS))
 	{
-		printf("Memory address not usable, abort\n");
+		//printf("Memory address (0x%X) not usable, abort\n", address);
 		//exit(0);
 	}
     // OAM bank, where sprite attributes are stored
@@ -630,8 +630,9 @@ byte readByteFromMemory(unsigned int address)
 	}
 	else if ((address >= ADDR_RESERVED1) && (address < ADDR_IO_PORTS))
 	{
-		printf("Memory address not usable, abort\n");
-		exit(0);
+		//printf("Memory address (0x%X) not usable, abort\n", address);
+		//exit(0);
+		return 0;
 	}
 	else if ((address >= ADDR_OAM_MEMORY) && (address < ADDR_RESERVED1))
 	{

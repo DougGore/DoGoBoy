@@ -219,6 +219,8 @@ gbStateStruct gbState;
 word opRecord[256];
 int opIndex;
 
+typedef void (*drawCallback)(void);
+
 // Functions exported from the processor
 void initCPU(void);
 unsigned int executeOpcode(void);
@@ -234,6 +236,7 @@ void loadRom(char* filename);
 // Functions exported from graphics module
 void updateGraphics(SDL_Surface* surface, Uint32 cycles);
 void drawTilemap(SDL_Surface* surface);
+void setDrawFrameFunction(drawCallback func);
 
 byte getJoypadState(void);
 

@@ -114,6 +114,11 @@ void drawFrame(void)
 	dstRect.w = GB_DISPLAY_WIDTH * scaleFactor;
 	dstRect.h = GB_DISPLAY_HEIGHT * scaleFactor;
 
+	if (showTilemap)
+	{
+		drawTilemap(gbSurface);
+	}
+
 	if (SDL_SoftStretch(gbSurface, NULL, screen, &dstRect) != 0)
 	{
 		printf("ERROR: Cannot blit surface\n");
@@ -470,6 +475,8 @@ int main(int argc, char *argv[])
         opcode_coverage[ii] = 0;
         cb_opcode_coverage[ii] = 0;
     }
+	
+	setDrawFrameFunction(&drawFrame);
 
     last_time = SDL_GetTicks();
     lastDelayTime = SDL_GetTicks();
@@ -501,14 +508,6 @@ int main(int argc, char *argv[])
             updateGraphics(gbSurface, cyclesExecuted);
             doInterrupts();
         }
-
-        if (showTilemap)
-		{
-			drawTilemap(gbSurface);
-		}
-
-        // Update the LCD display
-		drawFrame();
 
         // Process all pending events e.g. keypreses
         while(SDL_PollEvent(&sdl_event))

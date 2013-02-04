@@ -45,6 +45,12 @@ Graphics related emulation functions
 #define LCDC_SPRITES_ON					(1 << 1)
 #define LCDC_BG_WINDOW_ON				(1 << 0)
 
+#define OAM_ATTR_SPRITE_PRIORITY		(1 << 7)
+#define OAM_ATTR_Y_FLIP					(1 << 6)
+#define OAM_ATTR_X_FLIP					(1 << 5)
+#define OAM_ATTR_USE_OBJ1_PALETTE		(1 << 4)
+
+static drawCallback drawFrame = NULL;
 
 // Caclulate which shade of grey we need
 dword getColour(byte colourIndex, byte palette)
@@ -213,7 +219,7 @@ void drawTiles(SDL_Surface* surface, byte scanline)
     }
     else
     {
-        tileDataTable = 0x8800;
+        tileDataTable = ADDR_VIDEO_RAM + 0x800;
         unsignedNum = 0;
     }
 
@@ -222,11 +228,11 @@ void drawTiles(SDL_Surface* surface, byte scanline)
 		// Which backgroud memory are we using (bit 3)
 		if (gbIO.LCDCONT & LCDC_UPPER_TILE_MAP)
 		{
-			tileMapTable = 0x9C00;
+			tileMapTable = ADDR_VIDEO_RAM + 0x1C00;
 		}
 		else
 		{
-			tileMapTable = 0x9800;
+			tileMapTable = ADDR_VIDEO_RAM + 0x1800;
 		}
 	}
 	else
@@ -234,11 +240,11 @@ void drawTiles(SDL_Surface* surface, byte scanline)
 		// Which window memory are we using (bit 6)
 		if (gbIO.LCDCONT & LCDC_WINDOW_UPPER_TILE_SET)
 		{
-			tileMapTable = 0x9C00;
+			tileMapTable = ADDR_VIDEO_RAM + 0x1C00;
 		}
 		else
 		{
-			tileMapTable = 0x9800;
+			tileMapTable = ADDR_VIDEO_RAM + 0x1800;
 		}
 	}
 
@@ -345,33 +351,44 @@ void drawSprites(SDL_Surface* surface, byte scanline)
 		use8x16 = 1;
 	}
 
+	// The sprite attribute table holds up to 40 sprites
 	for (sprite = 0; sprite < 40; sprite++)
 	{
-		// sprite occupies 4 bytes in the sprite attributes table
+		// Sprite occupies 4 bytes in the sprite attributes table
 		index        = sprite * 4;
-		yPos		 = readByteFromMemory(ADDR_OAM_MEMORY + index) - 16;
-		xPos		 = readByteFromMemory(ADDR_OAM_MEMORY + index + 1) - 8;
-		tileLocation = readByteFromMemory(ADDR_OAM_MEMORY + index + 2) ;
-		attributes	 = readByteFromMemory(ADDR_OAM_MEMORY + index + 3) ;
+		
+		yPos		 = readByteFromMemory(ADDR_OAM_MEMORY + index);
+		xPos		 = readByteFromMemory(ADDR_OAM_MEMORY + index + 1);
+		tileLocation = readByteFromMemory(ADDR_OAM_MEMORY + index + 2);
+		attributes	 = readByteFromMemory(ADDR_OAM_MEMORY + index + 3);
 
-		yFlip = attributes & (1 << 6);
-		xFlip = attributes & (1 << 5);
+		yFlip = attributes & OAM_ATTR_Y_FLIP;
+		xFlip = attributes & OAM_ATTR_X_FLIP;
 
         // Check to see if the sprite is out of bounds and should be hidden
-        if ((0 == yPos) || (yPos >= GB_DISPLAY_WIDTH))
+        if ((0 == yPos) || (yPos >= GB_DISPLAY_HEIGHT + 16))
         {
             continue;
         }
-        else if ((0 == xPos) || (xPos >= 168))
+        else if ((0 == xPos) || (xPos >= GB_DISPLAY_WIDTH + 8))
         {
             continue;
         };
-
-		ysize = 8;
+		
+		// The positions are offset by 8 pixels on X and 16 pixels on Y when shown on screen
+		xPos -= 8;
+		yPos -= 16;
 
 		if (use8x16)
 		{
 			ysize = 16;
+
+			// Ignore the LSB in 8x16 mode
+			tileLocation &= 0xFE;
+		}
+		else
+		{
+			ysize = 8;
 		}
 
 		//printf("Iterate over sprites %d in %d?\n", yPos, scanline);
@@ -399,19 +416,19 @@ void drawSprites(SDL_Surface* surface, byte scanline)
 			{
 				colourbit = tilePixel;
 
-				// read the sprite in backwards for the x axis
+				// Read the sprite in backwards for the x axis
 				if (xFlip)
 				{
 					colourbit -= 7;
 					colourbit *= -1;
 				}
 
-				// the rest is the same as for tiles
+				// Rhe rest is the same as for tiles
 				colourNum = (data2 >> colourbit) & 0x01;
 				colourNum <<= 1;
 				colourNum |= (data1 >> colourbit) & 0x01;
 
-                if (attributes & (1 << 4))
+                if (attributes & OAM_ATTR_USE_OBJ1_PALETTE)
 				{
 					colourAddress = 0xFF49;
 				}
@@ -443,7 +460,7 @@ void drawSprites(SDL_Surface* surface, byte scanline)
 				pixel = xPos + xPix;
 
                 // If the background priority is greater than sprite, we need an extra check
-                if (attributes & (1 << 7))
+                if (attributes & OAM_ATTR_SPRITE_PRIORITY)
                 {
                     if (video_plane[pixel] != 0x00FFFFFF)
                     {
@@ -543,6 +560,7 @@ void updateGraphics(SDL_Surface* surface, Uint32 cycles)
             else if (gbIO.CURLINE > 153)
             {
                 gbIO.CURLINE = 0;
+				drawFrame();
             }
             // Draw the current scanline
             else if (gbIO.CURLINE < GB_DISPLAY_HEIGHT)
@@ -560,4 +578,9 @@ void updateGraphics(SDL_Surface* surface, Uint32 cycles)
     }
 
     //printf("Line: %i, enable: %i\n", gbIO.CURLINE, gbIO.LCDCONT & 0x80);
+}
+
+void setDrawFrameFunction(drawCallback func)
+{
+	drawFrame = func;
 }
