@@ -10,12 +10,12 @@ SDL_PATH := ../SDL-1.2.15/
 SDL_INC_PATH := $(SDL_PATH)include/SDL
 SDL_LIB_PATH := $(SDL_PATH)lib
 
-CCFLAGS = -I$(SDL_INC_PATH) $(shell sdl-config --cflags) -Wall -D_GNU_SOURCE=1 -Dmain=SDL_main
+CCFLAGS = -I$(SDL_INC_PATH) $(shell sdl-config --cflags) -Wall -D_GNU_SOURCE=1 -Dmain=SDL_main -O3
 LDFLAGS = -L$(SDL_LIB_PATH) $(shell sdl-config --libs)
 
 # Cygwin specific flag
 ifeq ($(shell uname -o),Cygwin)
-	CCFLAGS += -mno-cygwin
+	CCFLAGS += -mno-cygwin -mconsole
 endif	
 	
 TARGET = DoGoBoy
@@ -26,10 +26,9 @@ INCLUDES = -Iinclude
 		   
 LIBRARIES = \
             -lSDLmain \
-            -lSDL \
-			-mconsole
+            -lSDL
 
 all:
 	@echo "Compiling, go go DoGoBoy..."
-	@$(CC) -mconsole $(SOURCES) $(CCFLAGS) $(INCLUDES) $(LDFLAGS) $(LIBRARIES) -o $(TARGET)
+	@$(CC) $(SOURCES) $(CCFLAGS) $(INCLUDES) $(LDFLAGS) $(LIBRARIES) -o $(TARGET)
 	@echo "Done."
