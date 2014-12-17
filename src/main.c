@@ -39,6 +39,11 @@ graphics handling, program maintainence, etc.
 #include <Windows.h>
 #endif
 
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
+
 #include "SDL.h"
 
 #include "gameboy.h"
