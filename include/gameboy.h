@@ -228,6 +228,7 @@ void pushWordToStack(word data);
 
 // Functions exported from memory module
 byte readByteFromMemory(unsigned int address);
+word readWordFromMemory(unsigned int address);
 void writeByteToMemory(unsigned int address, byte value);
 void initGbMemory(void);
 void freeGbMemory(void);
