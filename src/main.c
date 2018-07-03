@@ -37,6 +37,9 @@ graphics handling, program maintainence, etc.
 
 #ifdef __WIN32__
 #include <Windows.h>
+#else
+#define TRUE	1
+#define FALSE	0
 #endif
 
 #ifndef TRUE
@@ -90,7 +93,22 @@ void exit_with_debug(void)
     }
 #endif
 
-    //printf("\nSP: 0x%X (value 0x%X)\n", REGS.w.SP, read_word_from_memory(REGS.w.SP));
+    //printf("\nSP: 0x%X (value 0x%X)\n", REGS.w.SP, readWordFromMemory(REGS.w.SP));
+	
+	if (REGS.w.SP > 0xFFE0)
+	{
+		printf("Unwinding the stack...\n");
+		
+		for (ii = REGS.w.SP; ii <= 0xFFFE; ii += 2)
+		{
+			printf("Addr: 0x%X, value: 0x%X\n", ii, readWordFromMemory(ii));
+		}
+	}
+	else
+	{
+		printf("Stack pointer in a non-standard location: 0x%X\n", REGS.w.SP);
+	}
+	
 
 	freeGbMemory();
 
