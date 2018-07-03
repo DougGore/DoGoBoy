@@ -1,5 +1,5 @@
 /******************************************************************************
-DoGoBoy - Nintendo GameBoy Emulator - ©2009 Douglas Gore (doug@ssonic.co.uk)
+DoGoBoy - Nintendo GameBoy Emulator
 *******************************************************************************
 Copyright (c) 2009-2013, Douglas Gore (doug@ssonic.co.uk)
 All rights reserved.

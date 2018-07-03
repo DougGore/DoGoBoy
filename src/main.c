@@ -1,5 +1,5 @@
 /******************************************************************************
-DoGoBoy - Nintendo GameBoy Emulator - ©2009 Douglas Gore (doug@ssonic.co.uk)
+DoGoBoy - Nintendo GameBoy Emulator
 *******************************************************************************
 Copyright (c) 2009-2013, Douglas Gore (doug@ssonic.co.uk)
 All rights reserved.
@@ -62,8 +62,10 @@ Uint32 last_time;
 
 char window_title[80];
 
-SDL_Surface *screen = NULL;
+SDL_Window *screen = NULL;
+SDL_Renderer *renderer = NULL;
 SDL_Surface *gbSurface = NULL;
+SDL_Texture *gbTexture = NULL;
 SDL_Joystick *joystick = NULL;
 
 static int showTilemap = FALSE;
@@ -119,21 +121,17 @@ void drawFrame(void)
 	dstRect.w = GB_DISPLAY_WIDTH * scaleFactor;
 	dstRect.h = GB_DISPLAY_HEIGHT * scaleFactor;
 
+	SDL_RenderClear(renderer);
+
 	if (showTilemap)
 	{
 		drawTilemap(gbSurface);
 	}
 
-	if (SDL_SoftStretch(gbSurface, NULL, screen, &dstRect) != 0)
-	{
-		printf("ERROR: Cannot blit surface\n");
-		exit(0);
-	}
-	
-    if (SDL_Flip(screen) != 0)
-	{
-		printf("ERROR: Could not flip framebuffer\n");
-	}
+	SDL_UpdateTexture(gbTexture, NULL, gbSurface->pixels, gbSurface->pitch);
+	SDL_RenderCopy(renderer, gbTexture, NULL, NULL);
+
+    SDL_RenderPresent(renderer);
     
     frames++;
 }
@@ -370,30 +368,29 @@ int main(int argc, char *argv[])
         return 1;
     }
 	
-	videoFlags = SDL_HWSURFACE | SDL_HWACCEL | SDL_DOUBLEBUF;
+	videoFlags = SDL_WINDOW_SHOWN;
 
 	// Set full screen mode flag (no HW acceleration without it)
 	if (fullscreen)
 	{
-		videoFlags |= SDL_FULLSCREEN;
+		videoFlags |= SDL_WINDOW_FULLSCREEN;
 	}
 	
 	// Configure video output to 160x144 (GB resolution) at 32bpp
-    screen = SDL_SetVideoMode(GB_DISPLAY_WIDTH * scaleFactor, GB_DISPLAY_HEIGHT * scaleFactor, 32, videoFlags);
-	//screen = SDL_SetVideoMode(800, 600, 32, videoFlags);
+	SDL_CreateWindowAndRenderer(GB_DISPLAY_WIDTH * scaleFactor,
+								  GB_DISPLAY_HEIGHT * scaleFactor,
+                          		  videoFlags,
+								  &screen,
+								  &renderer);
 
 	if (!screen)
 	{
 		printf("ERROR: Failed to create a valid screen buffer\n");
 		return 0;
 	}
-	else
-	{
-		printf("Display surface in HW: %s\n", (screen->flags & SDL_HWSURFACE) ? "yes" : "no");
-		printf("Display HW accelerated: %s\n", (screen->flags & SDL_HWACCEL) ? "yes" : "no");
-		printf("Display double buffered: %s\n", (screen->flags & SDL_DOUBLEBUF) ? "yes" : "no");
-	}
-	
+
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
     Uint32 rmask, gmask, bmask, amask;
 
     /* SDL interprets each pixel as a 32-bit number, so our masks must depend
@@ -411,13 +408,18 @@ int main(int argc, char *argv[])
 #endif
 
 	gbSurface = SDL_CreateRGBSurface(0, GB_DISPLAY_WIDTH, GB_DISPLAY_HEIGHT, 32, rmask, gmask, bmask, 0 /*amask*/);
-	
+
 	if (!gbSurface)
 	{
 		printf("ERROR: Failed to create offscreen surface\n");
 		return 0;
 	}
-	
+
+	gbTexture = SDL_CreateTexture(renderer,
+								SDL_PIXELFORMAT_ARGB8888,
+								SDL_TEXTUREACCESS_STREAMING,
+								GB_DISPLAY_WIDTH, GB_DISPLAY_HEIGHT);
+
 	SDL_JoystickEventState(SDL_ENABLE);
 	joystick = SDL_JoystickOpen(0);
 
@@ -647,7 +649,7 @@ int main(int argc, char *argv[])
         {
             sprintf(window_title, "DoGoBoy FPS: %d", frames);
 
-            SDL_WM_SetCaption(window_title, NULL);
+            SDL_SetWindowTitle(screen, window_title);
 
             frames = 0;
             last_time = SDL_GetTicks();
