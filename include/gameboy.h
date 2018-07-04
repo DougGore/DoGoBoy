@@ -66,112 +66,105 @@ Header file for defining important values/structures and sharing functions.
 #define CYCLES_PER_FRAME 69905
 
 #define DOGO_LITTLE_ENDIAN
-#define bool _Bool
-
-typedef unsigned char byte;
-typedef signed char sbyte;
-typedef unsigned short word;
-typedef signed short sword;
-typedef unsigned int dword;
 
 union _REGS
 {
 #ifdef DOGO_LITTLE_ENDIAN
 	struct
 	{
-		byte C;				// Counter
-		byte B;				// GP register
-		byte E;				// GP register
-		byte D;				// GP register
-		byte L;
-		byte H;
-		byte F;				// Status flags
-		byte A;				// Accumulator
-		byte PCh;
-		byte PCl;
-		byte SPh;
-		byte SPl;
+		uint8_t C;				// Counter
+		uint8_t B;				// GP register
+		uint8_t E;				// GP register
+		uint8_t D;				// GP register
+		uint8_t L;
+		uint8_t H;
+		uint8_t F;				// Status flags
+		uint8_t A;				// Accumulator
+		uint8_t PCh;
+		uint8_t PCl;
+		uint8_t SPh;
+		uint8_t SPl;
 	} b;
 #else
 	struct
 	{
-		byte B;				// GP register
-		byte C;				// Counter
-		byte D;				// GP register
-		byte E;				// GP register
-		byte H;
-		byte L;
-		byte A;				// Accumulator
-		byte F;				// Status flags
-		byte PCl;
-		byte PCh;
-		byte SPl;
-		byte SPh;
+		uint8_t B;				// GP register
+		uint8_t C;				// Counter
+		uint8_t D;				// GP register
+		uint8_t E;				// GP register
+		uint8_t H;
+		uint8_t L;
+		uint8_t A;				// Accumulator
+		uint8_t F;				// Status flags
+		uint8_t PCl;
+		uint8_t PCh;
+		uint8_t SPl;
+		uint8_t SPh;
 	} b;
 #endif
 	
 	struct
 	{
-		word BC;
-		word DE;
-		word HL;
-		word AF;
-		word PC;			// Program counter
-		word SP;			// Stack pointer
+		uint16_t BC;
+		uint16_t DE;
+		uint16_t HL;
+		uint16_t AF;
+		uint16_t PC;			// Program counter
+		uint16_t SP;			// Stack pointer
 	} w;
 } REGS;
 
 typedef struct
 {
-	byte JOYPAD;
-	byte SIODATA;
-	byte SIOCONT;
-	byte DIVIDER;
-	byte TIMECNT;
-	byte TIMEMOD;
-	byte TIMECONT;
-	byte IFLAGS;
-	byte SNDREG10;
-	byte SNDREG11;
-	byte SNDREG12;
-	byte SNDREG13;
-	byte SNDREG14;
-	byte SNDREG21;
-	byte SNDREG22;
-	byte SNDREG23;
-	byte SNDREG24;
-	byte SNDREG30;
-	byte SNDREG31;
-	byte SNDREG32;
-	byte SNDREG33;
-	byte SNDREG34;
-	byte SNDREG41;
-	byte SNDREG42;
-	byte SNDREG43;
-	byte SNDREG44;
-	byte SNDREG50;
-	byte SNDREG51;
-	byte SNDREG52;
-	byte LCDCONT;
-	byte LCDSTAT;
-	byte SCROLLX;
-	byte SCROLLY;
-	byte CURLINE;
-	byte CMPLINE;
-	byte BGRDPAL;
-	byte OBJ0PAL;
-	byte OBJ1PAL;
-	byte WNDPOSY;
-	byte WNDPOSX;
-	byte KEY1;					// Prepare speed switch (CGB)
-	byte DMACONT;
-	byte ISWITCH;
+	uint8_t JOYPAD;
+	uint8_t SIODATA;
+	uint8_t SIOCONT;
+	uint8_t DIVIDER;
+	uint8_t TIMECNT;
+	uint8_t TIMEMOD;
+	uint8_t TIMECONT;
+	uint8_t IFLAGS;
+	uint8_t SNDREG10;
+	uint8_t SNDREG11;
+	uint8_t SNDREG12;
+	uint8_t SNDREG13;
+	uint8_t SNDREG14;
+	uint8_t SNDREG21;
+	uint8_t SNDREG22;
+	uint8_t SNDREG23;
+	uint8_t SNDREG24;
+	uint8_t SNDREG30;
+	uint8_t SNDREG31;
+	uint8_t SNDREG32;
+	uint8_t SNDREG33;
+	uint8_t SNDREG34;
+	uint8_t SNDREG41;
+	uint8_t SNDREG42;
+	uint8_t SNDREG43;
+	uint8_t SNDREG44;
+	uint8_t SNDREG50;
+	uint8_t SNDREG51;
+	uint8_t SNDREG52;
+	uint8_t LCDCONT;
+	uint8_t LCDSTAT;
+	uint8_t SCROLLX;
+	uint8_t SCROLLY;
+	uint8_t CURLINE;
+	uint8_t CMPLINE;
+	uint8_t BGRDPAL;
+	uint8_t OBJ0PAL;
+	uint8_t OBJ1PAL;
+	uint8_t WNDPOSY;
+	uint8_t WNDPOSX;
+	uint8_t KEY1;					// Prepare speed switch (CGB)
+	uint8_t DMACONT;
+	uint8_t ISWITCH;
 } gbIOstruct;
 
 typedef struct
 {
-	byte mask;
-	byte value;
+	uint8_t mask;
+	uint8_t value;
 } logicTest;
 
 typedef enum
@@ -194,29 +187,29 @@ enum
 
 typedef struct
 {
-	byte IME;
-    byte cpuHalted;
+	uint8_t IME;
+    uint8_t cpuHalted;
 	int lcdMode;
 	signed int lcdModePeriod;
 	signed int timerPeriod;
 	int divideRegister;
-    byte bgPal[4];
-    byte obj0Pal[4];
-    byte obj1Pal[4];
+    uint8_t bgPal[4];
+    uint8_t obj0Pal[4];
+    uint8_t obj1Pal[4];
     mbcType mbc;
-    byte romBanks;
-    byte currentRomBank;
+    uint8_t romBanks;
+    uint8_t currentRomBank;
     unsigned int ramSize;
-    byte ramMode;
-    byte currentRamBank;
-    byte batteryBackup;
-	byte keysState;
+    uint8_t ramMode;
+    uint8_t currentRamBank;
+    uint8_t batteryBackup;
+	uint8_t keysState;
 } gbStateStruct;
 
 gbIOstruct gbIO;
 gbStateStruct gbState;
 
-word opRecord[256];
+uint16_t opRecord[256];
 int opIndex;
 
 typedef void (*drawCallback)(void);
@@ -224,12 +217,12 @@ typedef void (*drawCallback)(void);
 // Functions exported from the processor
 void initCPU(void);
 unsigned int executeOpcode(void);
-void pushWordToStack(word data);
+void pushWordToStack(uint16_t data);
 
 // Functions exported from memory module
-byte readByteFromMemory(unsigned int address);
-word readWordFromMemory(unsigned int address);
-void writeByteToMemory(unsigned int address, byte value);
+uint8_t readByteFromMemory(uint16_t address);
+uint16_t readWordFromMemory(uint16_t address);
+void writeByteToMemory(unsigned int address, uint8_t value);
 void initGbMemory(void);
 void freeGbMemory(void);
 void loadRom(char* filename);
@@ -239,7 +232,7 @@ void updateGraphics(SDL_Surface* surface, Uint32 cycles);
 void drawTilemap(SDL_Surface* surface);
 void setDrawFrameFunction(drawCallback func);
 
-byte getJoypadState(void);
+uint8_t getJoypadState(void);
 
 void writeLog(char* log_message, ...);
 void exit_with_debug(void);

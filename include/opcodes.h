@@ -1,5 +1,5 @@
 /******************************************************************************
-DoGoBoy - Nintendo GameBoy Emulator - ©2009 Douglas Gore (doug@ssonic.co.uk)
+DoGoBoy - Nintendo GameBoy Emulator - ï¿½2009 Douglas Gore (doug@ssonic.co.uk)
 *******************************************************************************
 Copyright (c) 2009-2013, Douglas Gore (doug@ssonic.co.uk)
 All rights reserved.
@@ -46,10 +46,10 @@ typedef enum
 typedef struct
 {
     char* text;
-    byte  m_cycles;
+    uint8_t m_cycles;
 } opcodeStruct;
 
-byte opcode_cycles[] =
+uint8_t opcode_cycles[] =
 {
 //  00  01  02  03  04  05  06  07  08  09  0A  0B  0C  0D  0E  0F
 	 4, 12,  8,  8,  4,  4,  8,  4, 20,  8,  8,  8,  4,  4,  8,  4,		// 0x00 - 0x0F
@@ -70,7 +70,7 @@ byte opcode_cycles[] =
 	12, 12,  8,  4,  4, 16,  8, 16, 12,  8, 16,  4,  4,  4,  8, 16		// 0xF0 - 0xFF
 };
 
-byte cb_opcode_cycles[] =
+uint8_t cb_opcode_cycles[] =
 {
 //  00  01  02  03  04  05  06  07  08  09  0A  0B  0C  0D  0E  0F
 	 8,  8,  8,  8,  8,  8, 16,  8,  8,  8,  8,  8,  8,  8, 16,  8,

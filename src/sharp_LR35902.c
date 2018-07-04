@@ -58,21 +58,21 @@ char opcodeBuffer[32];
 #endif
 
 // Reads a word from memory by making two byte read requests
-word __inline readWordFromMemory(unsigned int address)
+uint16_t __inline readWordFromMemory(uint16_t address)
 {
 	//return ((readByteFromMemory(address) << 8) | readByteFromMemory(address + 1));
     return ((readByteFromMemory(address + 1) << 8) | readByteFromMemory(address));
 }
 
 // Writes a word to memory using two byte writes
-void __inline writeWordToMemory(unsigned int address, word value)
+void __inline writeWordToMemory(uint16_t address, uint16_t value)
 {
     writeByteToMemory(address, value >> 8);
     writeByteToMemory(address + 1, value & 0xFF);
 }
 
 // Push a word onto the stack
-void __inline pushWordToStack(word data)
+void __inline pushWordToStack(uint16_t data)
 {
     REGS.w.SP--;
     writeByteToMemory(REGS.w.SP, (data >> 8) & 0xFF);
@@ -81,9 +81,9 @@ void __inline pushWordToStack(word data)
 }
 
 // Pop a word from the stack
-static __inline word popWordFromStack(void)
+static __inline uint16_t popWordFromStack(void)
 {
-    word temp;
+    uint16_t temp;
 
     temp = readByteFromMemory(REGS.w.SP);
     REGS.w.SP++;
@@ -93,7 +93,7 @@ static __inline word popWordFromStack(void)
     return temp;
 }
 
-static __inline void setFlagZ(byte value)
+static __inline void setFlagZ(uint8_t value)
 {
 	// Set the Z zero flag if new value is 0
 	if (0x01 == value)
@@ -106,12 +106,12 @@ static __inline void setFlagZ(byte value)
 	}
 }
 
-static __inline byte getFlagZ(void)
+static __inline uint8_t getFlagZ(void)
 {
 	return (REGS.b.F & 0x80);
 }
 
-static __inline void setFlagC(byte value)
+static __inline void setFlagC(uint8_t value)
 {
 	// Set the C carry flag is the result exceeds max register value
 	if (0x01 == value)
@@ -124,12 +124,12 @@ static __inline void setFlagC(byte value)
 	}
 }
 
-static __inline byte getFlagC(void)
+static __inline uint8_t getFlagC(void)
 {
 	return (REGS.b.F & 0x10);
 }
 
-static __inline void setFlagH(byte value)
+static __inline void setFlagH(uint8_t value)
 {
 	// Set H flag
 	if (0x01 == value)
@@ -142,7 +142,7 @@ static __inline void setFlagH(byte value)
 	}
 }
 
-static void setFlagN(byte value)
+static void setFlagN(uint8_t value)
 {
 	// Set N subtract flag is the new value is less than the old value
 	if (0x01 == value)
@@ -155,12 +155,12 @@ static void setFlagN(byte value)
 	}
 }
 
-static __inline byte getFlagN(void)
+static __inline uint8_t getFlagN(void)
 {
 	return (REGS.b.F & 0x40);
 }
 
-static __inline void setZonZero(byte toCheck)
+static __inline void setZonZero(uint8_t toCheck)
 {
     if (0x00 == toCheck)
     {
@@ -180,9 +180,9 @@ void initCPU(void)
 }
 
 // DECrement a register
-static __inline byte cpuDEC(register byte reg)
+static __inline uint8_t cpuDEC(register uint8_t reg)
 {
-	byte before;
+	uint8_t before;
 
 	before = reg;
 
@@ -210,9 +210,9 @@ static __inline byte cpuDEC(register byte reg)
 }
 
 // INCrement a register
-static __inline byte cpuINC(register byte reg)
+static __inline uint8_t cpuINC(register uint8_t reg)
 {
-	byte before;
+	uint8_t before;
 
 	before = reg;
 
@@ -239,11 +239,11 @@ static __inline byte cpuINC(register byte reg)
 }
 
 // ComPare a value to that in the accumulator
-static __inline void cpuCP(register byte compare_value)
+static __inline void cpuCP(register uint8_t compare_value)
 {
-	byte before;
-    byte reg;
-    sword hTest;
+	uint8_t before;
+    uint8_t reg;
+    int16_t hTest;
     
     reg = REGS.b.A;
     before = REGS.b.A;
@@ -363,7 +363,7 @@ static __inline void cpuDAA(void)
 }
 
 // AND the accumulator
-static __inline void cpuAND(register byte value)
+static __inline void cpuAND(register uint8_t value)
 {
 	REGS.b.A &= value;
 
@@ -375,7 +375,7 @@ static __inline void cpuAND(register byte value)
 }
 
 // OR the accumulator
-static __inline void cpuOR(register byte value)
+static __inline void cpuOR(register uint8_t value)
 {
     REGS.b.A |= value;
 
@@ -387,7 +387,7 @@ static __inline void cpuOR(register byte value)
 }
 
 // XOR the accumulator
-static __inline void cpuXOR(register byte value)
+static __inline void cpuXOR(register uint8_t value)
 {
     REGS.b.A ^= value;
 
@@ -399,10 +399,10 @@ static __inline void cpuXOR(register byte value)
 }
 
 // SUBtractor from the accumulator
-static __inline void cpuSUB(register byte value)
+static __inline void cpuSUB(register uint8_t value)
 {
-	byte before;
-	sword hTest;
+	uint8_t before;
+	int16_t hTest;
 
 	before = REGS.b.A;
 
@@ -436,10 +436,10 @@ static __inline void cpuSUB(register byte value)
 }
 
 // ADD to the accumulator
-static __inline void cpuADD(register byte adding)
+static __inline void cpuADD(register uint8_t adding)
 {
-	byte before = REGS.b.A;
-	sword hTest;
+	uint8_t before = REGS.b.A;
+	int16_t hTest;
 
 	REGS.b.A += adding;
 
@@ -469,9 +469,9 @@ static __inline void cpuADD(register byte adding)
 	}
 }
 
-static __inline word cpuADDw(register word reg, word adding)
+static __inline uint16_t cpuADDw(register uint16_t reg, uint16_t adding)
 {
-	word before = reg;
+	uint16_t before = reg;
 
 	reg += adding;
 
@@ -500,9 +500,9 @@ static __inline word cpuADDw(register word reg, word adding)
 	return reg;
 }
 
-static __inline void cpuADDSP(sbyte offset)
+static __inline void cpuADDSP(int8_t offset)
 {
-    word before;
+    uint16_t before;
 
     before = REGS.w.SP;
 
@@ -531,10 +531,10 @@ static __inline void cpuADDSP(sbyte offset)
 }
 
 // ADd and Carry to accumulator
-static __inline void cpuADC(register byte adding)
+static __inline void cpuADC(register uint8_t adding)
 {
-	byte before = REGS.b.A;
-	sword hTest;
+	uint8_t before = REGS.b.A;
+	int16_t hTest;
 
     // Check carry flag
     if (getFlagC())
@@ -571,10 +571,10 @@ static __inline void cpuADC(register byte adding)
 }
 
 // SuBtract and Carry from accumulator
-static __inline void cpuSBC(register byte value)
+static __inline void cpuSBC(register uint8_t value)
 {
-	byte before;
-	sword hTest;
+	uint8_t before;
+	int16_t hTest;
 
 	before = REGS.b.A;
 
@@ -614,7 +614,7 @@ static __inline void cpuSBC(register byte value)
 }
 
 // Test BIT in register
-static __inline void cpuBIT(byte bit, byte value)
+static __inline void cpuBIT(uint8_t bit, uint8_t value)
 {
 	if ((value & (1 << bit)) == 0)
 	{
@@ -630,22 +630,22 @@ static __inline void cpuBIT(byte bit, byte value)
 	// C flag not affected
 }
 
-static __inline byte cpuRES(byte bit, byte value)
+static __inline uint8_t cpuRES(uint8_t bit, uint8_t value)
 {
 	// No flags affected
 	return value & ~(1 << bit);
 }
 
-static __inline byte cpuSET(byte bit, byte value)
+static __inline uint8_t cpuSET(uint8_t bit, uint8_t value)
 {
 	// No flags affected
 	return value | (1 << bit);
 }
 
 // CALL operation, push address to stack then jump
-static __inline void cpuCALL(byte useCondition, byte flag, byte set)
+static __inline void cpuCALL(uint8_t useCondition, uint8_t flag, uint8_t set)
 {
-	word jumpAddress;
+	uint16_t jumpAddress;
 	
 	jumpAddress = readWordFromMemory(REGS.w.PC);
 	REGS.w.PC += 2;
@@ -668,7 +668,7 @@ static __inline void cpuCALL(byte useCondition, byte flag, byte set)
 }
 
 // RETurn - pop word from stack and jump to address
-static __inline void cpuRET(byte flag, byte set)
+static __inline void cpuRET(uint8_t flag, uint8_t set)
 {
 	// Is Z flag is not set then jump
 	if ((REGS.b.F & (1 << flag)) == (set << flag))
@@ -678,9 +678,9 @@ static __inline void cpuRET(byte flag, byte set)
 }
 
 // JumP to address (may be conditional)
-static __inline void cpuJP(byte useCondition, byte flag, byte set)
+static __inline void cpuJP(uint8_t useCondition, uint8_t flag, uint8_t set)
 {
-	word jumpAddress;
+	uint16_t jumpAddress;
 
 	jumpAddress = readWordFromMemory(REGS.w.PC);
 	REGS.w.PC += 2;
@@ -700,9 +700,9 @@ static __inline void cpuJP(byte useCondition, byte flag, byte set)
 }
 
 // Jump Relative to current address
-static __inline void cpuJR(byte flag, byte set)
+static __inline void cpuJR(uint8_t flag, uint8_t set)
 {
-	sbyte index = readByteFromMemory(REGS.w.PC++);
+	int8_t index = readByteFromMemory(REGS.w.PC++);
 	
 	// Is Z flag is not set then jump
 	if ((REGS.b.F & (1 << flag)) == (set << flag))
@@ -712,7 +712,7 @@ static __inline void cpuJR(byte flag, byte set)
 }
 
 // SWAP upper and lower nibbles
-static __inline byte cpuSWAP(register byte reg)
+static __inline uint8_t cpuSWAP(register uint8_t reg)
 {
     reg = ((reg & 0xF0) >> 4) | ((reg & 0x0F) << 4);
 
@@ -726,9 +726,9 @@ static __inline byte cpuSWAP(register byte reg)
 }
 
 // Shift Left into carry (LSB set to 0)
-static __inline byte cpuSLA(register byte reg)
+static __inline uint8_t cpuSLA(register uint8_t reg)
 {
-    byte msb = reg & 0x80;
+    uint8_t msb = reg & 0x80;
 
 	reg <<= 1;
 
@@ -750,9 +750,9 @@ static __inline byte cpuSLA(register byte reg)
 }
 
 // Shift Right into carry (MSB set to 0)
-static __inline byte cpuSRL(register byte reg)
+static __inline uint8_t cpuSRL(register uint8_t reg)
 {
-    byte lsb;
+    uint8_t lsb;
 
     lsb = reg & 0x01;
 	
@@ -776,10 +776,10 @@ static __inline byte cpuSRL(register byte reg)
 }
 
 // Shift Right into carry (MSB unaffected)
-static __inline byte cpuSRA(register byte reg)
+static __inline uint8_t cpuSRA(register uint8_t reg)
 {
-    byte lsb;
-    byte msb;
+    uint8_t lsb;
+    uint8_t msb;
 
     lsb = reg & 0x01;
     msb = reg & 0x80;
@@ -809,9 +809,9 @@ static __inline byte cpuSRA(register byte reg)
 }
 
 // Rotate Left through carry
-static __inline byte cpuRL(register byte reg)
+static __inline uint8_t cpuRL(register uint8_t reg)
 {
-    byte msb;
+    uint8_t msb;
 
     msb = reg & 0x80;
     
@@ -841,9 +841,9 @@ static __inline byte cpuRL(register byte reg)
 }
 
 // Rotate Left (old bit 7 to Carry)
-static __inline byte cpuRLC(register byte reg)
+static __inline uint8_t cpuRLC(register uint8_t reg)
 {
-    byte msb = reg & 0x80;
+    uint8_t msb = reg & 0x80;
 
 	reg <<= 1;
 	
@@ -866,10 +866,10 @@ static __inline byte cpuRLC(register byte reg)
 }
 
 // Rotate Right through carry
-static __inline byte cpuRR(register byte reg)
+static __inline uint8_t cpuRR(register uint8_t reg)
 {
-	byte carry = getFlagC();
-    byte lsb = reg & 0x01;
+	uint8_t carry = getFlagC();
+    uint8_t lsb = reg & 0x01;
 
     reg >>= 1;
 
@@ -897,9 +897,9 @@ static __inline byte cpuRR(register byte reg)
 }
 
 // Rotate Right through Carry (old bit 0 to carry)
-static __inline byte cpuRRC(register byte reg)
+static __inline uint8_t cpuRRC(register uint8_t reg)
 {
-    byte lsb = reg & 0x01;
+    uint8_t lsb = reg & 0x01;
 
     reg >>= 1;
 
@@ -922,14 +922,14 @@ static __inline byte cpuRRC(register byte reg)
 }
 
 // ReSarT - push current address to stack and jump to address
-static __inline void cpuRST(byte address)
+static __inline void cpuRST(uint8_t address)
 {
     pushWordToStack(REGS.w.PC);
     REGS.w.PC = address;
 }
 
 // LoaD HL, put SP + offset into HL
-static __inline void cpuLDHL(sbyte offset)
+static __inline void cpuLDHL(int8_t offset)
 {
 	REGS.w.HL = (REGS.w.SP + offset) & 0xFFFF;
 
@@ -958,7 +958,7 @@ static __inline void cpuLDHL(sbyte offset)
 static __inline unsigned int executeExetendedOpcode(void)
 {
     unsigned int cycles_executed;
-	byte opcode = readByteFromMemory(REGS.w.PC++);
+	uint8_t opcode = readByteFromMemory(REGS.w.PC++);
 
 #ifdef GAMEBOY_DEBUG
 	writeLog("0x%04X: %s\n", REGS.w.PC - 1, cb_opcodes[opcode].text);
@@ -1272,7 +1272,7 @@ unsigned int executeOpcode(void)
     unsigned int cycles_executed;
 	
 	// Fetch
-	byte opcode = readByteFromMemory(REGS.w.PC++);
+	uint8_t opcode = readByteFromMemory(REGS.w.PC++);
     
 #ifdef GAMEBOY_DEBUG
     switch(opcode_params[opcode])
@@ -1459,7 +1459,7 @@ unsigned int executeOpcode(void)
 	case 0x08: writeWordToMemory(readWordFromMemory(REGS.w.PC), REGS.w.SP); REGS.w.PC += 2; break;
 
 	// LDHL SP, d
-	case 0xF8: cpuLDHL((sbyte)readByteFromMemory(REGS.w.PC++)); break;
+	case 0xF8: cpuLDHL((int8_t)readByteFromMemory(REGS.w.PC++)); break;
 
 	// LD SP, HL
     case 0xF9: REGS.w.SP = REGS.w.HL; break;
@@ -1605,12 +1605,12 @@ unsigned int executeOpcode(void)
 	case 0x39: REGS.w.HL = cpuADDw(REGS.w.HL, REGS.w.SP); break;
 
 	// ADD SP, d (non-Z80)
-	case 0xE8: cpuADDSP((sbyte)readByteFromMemory(REGS.w.PC++)); break;
+	case 0xE8: cpuADDSP((int8_t)readByteFromMemory(REGS.w.PC++)); break;
 
     // JUMPs
    
     // JR e
-    case 0x18: REGS.w.PC += (sbyte)readByteFromMemory(REGS.w.PC); REGS.w.PC++; break;
+    case 0x18: REGS.w.PC += (int8_t)readByteFromMemory(REGS.w.PC); REGS.w.PC++; break;
 
     // JR NZ, e
     case 0x20: cpuJR(FLAG_Z, 0); break;

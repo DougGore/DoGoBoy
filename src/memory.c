@@ -1,5 +1,5 @@
 /******************************************************************************
-DoGoBoy - Nintendo GameBoy Emulator - ©2009 Douglas Gore (doug@ssonic.co.uk)
+DoGoBoy - Nintendo GameBoy Emulator - ï¿½2009 Douglas Gore (doug@ssonic.co.uk)
 *******************************************************************************
 Copyright (c) 2009-2013, Douglas Gore (doug@ssonic.co.uk)
 All rights reserved.
@@ -38,21 +38,21 @@ Memory related emulation functions
 
 #include "gameboy.h"
 
-byte WRAMbank0[0x1000];	    // 4KB WRAM bank 0
-byte WRAMbank1[0x1000];	    // 4KB WRAM bank 1
-byte VRAMbank[0x2000];      // 8 KB VRAM bank
-byte HRAMbank[0x80];		// 128B HRAM
-byte OAMbank[0xA0];		    // 160B OAM
-byte WFbank[0x10];			// Waveform RAM
+uint8_t WRAMbank0[0x1000];	    // 4KB WRAM bank 0
+uint8_t WRAMbank1[0x1000];	    // 4KB WRAM bank 1
+uint8_t VRAMbank[0x2000];      	// 8 KB VRAM bank
+uint8_t HRAMbank[0x80];			// 128B HRAM
+uint8_t OAMbank[0xA0];		    // 160B OAM
+uint8_t WFbank[0x10];			// Waveform RAM
 
-byte* cartData = NULL;
-byte* switchRAM;
-byte* switchRAMPtr;
+uint8_t* cartData = NULL;
+uint8_t* switchRAM;
+uint8_t* switchRAMPtr;
 
-static void dmaTransfer(word address);
+static void dmaTransfer(uint16_t address);
 
 // Write a byte of data into Game Boy memory
-void writeByteToMemory(unsigned int address, byte value)
+void writeByteToMemory(unsigned int address, uint8_t value)
 {
 /*
 --------------------------- FFFF  | 32kB ROMs are non-switchable and occupy
@@ -417,7 +417,7 @@ void writeByteToMemory(unsigned int address, byte value)
 	}
 }
 
-byte readByteFromMemory(unsigned int address)
+uint8_t readByteFromMemory(uint16_t address)
 {
 /*
 --------------------------- FFFF  | 32kB ROMs are non-switchable and occupy
@@ -695,7 +695,7 @@ byte readByteFromMemory(unsigned int address)
 }
 
 // Transfer some data straight into Object Attribute Memory (OAM)
-void dmaTransfer(word address)
+void dmaTransfer(uint16_t address)
 {
 	int ii;
 

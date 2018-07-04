@@ -52,30 +52,25 @@ Graphics related emulation functions
 
 static drawCallback drawFrame = NULL;
 
+static gb_colour_map[] = {
+    0x00FFFFFF,
+    0x00CCCCCC,
+    0x00777777,
+    0x00000000  
+};
+
 // Caclulate which shade of grey we need
-dword getColour(byte colourIndex, byte palette)
+uint32_t getColour(uint8_t colourIndex, uint8_t palette)
 {
-    byte colour;
-    dword rgb = 0;
+    uint8_t colour = (palette >> (colourIndex * 2)) & 0x03;
 
-    colour = (palette >> (colourIndex * 2)) & 0x03;
-
-    switch(colour)
-    {
-    // White
-    case 0: rgb = 0x00FFFFFF; break;
-    case 1: rgb = 0x00CCCCCC; break;
-    case 2: rgb = 0x00777777; break;
-    case 3: rgb = 0x00000000; break;
-    }
-
-    return rgb;
+    return gb_colour_map[colour];
 }
 
 void setLcdStatus(void)
 {
-    byte requestInterrupt = 0;
-    byte currentMode;
+    uint8_t requestInterrupt = 0;
+    uint8_t currentMode;
 
     // If LCD is not enabled
     if ((gbIO.LCDCONT & LCDC_LCD_ON) == 0)
@@ -175,31 +170,31 @@ void setLcdStatus(void)
 }
 
 // Draw a scanline of the tile layer to the output bitmap
-void drawTiles(SDL_Surface* surface, byte scanline)
+void drawTiles(SDL_Surface* surface, uint8_t scanline)
 {
-    const dword tileSizeInBytes = 16;
+    const uint32_t tileSizeInBytes = 16;
 
-    byte xx;
+    uint8_t xx;
 	int tx;
-    byte colourIndex;
-    byte b1, b2;
+    uint8_t colourIndex;
+    uint8_t b1, b2;
 
-    dword tileDataTable;
-    dword tileMapTable;
-    dword tileRow;
-	dword tileCol;
+    uint32_t tileDataTable;
+    uint32_t tileMapTable;
+    uint32_t tileRow;
+	uint32_t tileCol;
     signed int tileNumber;
-	dword tileLocation;
+	uint32_t tileLocation;
 
-	byte xPos, yPos, line;
+	uint8_t xPos, yPos, line;
 
-    dword* video_plane;
+    uint32_t* video_plane;
 
-    byte unsignedNum = 1;
-	byte usingWindow = 0;
+    uint8_t unsignedNum = 1;
+	uint8_t usingWindow = 0;
 
-	byte windowX = gbIO.WNDPOSX - 7;
-	byte windowY = gbIO.WNDPOSY;
+	uint8_t windowX = gbIO.WNDPOSX - 7;
+	uint8_t windowY = gbIO.WNDPOSY;
 
     video_plane = &((Uint32*)surface->pixels)[scanline * surface->w];
 
@@ -257,7 +252,7 @@ void drawTiles(SDL_Surface* surface, byte scanline)
 		yPos = scanline - windowY;
 	}
 
-	tileRow = (byte)(yPos / 8) * 32;
+	tileRow = (uint8_t)(yPos / 8) * 32;
 
 	for (xx = 0; xx < GB_DISPLAY_WIDTH; xx++)
     {
@@ -282,7 +277,7 @@ void drawTiles(SDL_Surface* surface, byte scanline)
         }
         else
         {
-            tileNumber = (sbyte)readByteFromMemory(tileMapTable + tileRow + tileCol);
+            tileNumber = (int8_t)readByteFromMemory(tileMapTable + tileRow + tileCol);
 			tileLocation += (tileNumber + 128) * tileSizeInBytes;
         }
 
@@ -303,16 +298,16 @@ void drawTiles(SDL_Surface* surface, byte scanline)
 }
 
 // Draw a scanline of the sprites layer to the output bitmap
-void drawSprites(SDL_Surface* surface, byte scanline)
+void drawSprites(SDL_Surface* surface, uint8_t scanline)
 {
 	int use8x16 = 0;
-	byte sprite;
+	uint8_t sprite;
 	
-	byte index;
-	byte yPos;
-	byte xPos;
-	byte tileLocation;
-	byte attributes;
+	uint8_t index;
+	uint8_t yPos;
+	uint8_t xPos;
+	uint8_t tileLocation;
+	uint8_t attributes;
 
 	int yFlip;
 	int xFlip;
@@ -320,9 +315,9 @@ void drawSprites(SDL_Surface* surface, byte scanline)
 	int ysize;
 	int line;
 
-	word dataAddress;
-	byte data1;
-	byte data2;
+	uint16_t dataAddress;
+	uint8_t data1;
+	uint8_t data2;
 
 	int tilePixel;
 	int colourbit;
@@ -330,12 +325,12 @@ void drawSprites(SDL_Surface* surface, byte scanline)
 	int pixel;
 	int xPix;
 
-	byte colourNum;
-	dword colourValue;
+	uint8_t colourNum;
+	uint32_t colourValue;
 
-	word colourAddress;
+	uint16_t colourAddress;
 
-    dword* video_plane;
+    uint32_t* video_plane;
 
 	video_plane = &((unsigned int*)surface->pixels)[scanline * surface->w];
 
@@ -406,7 +401,7 @@ void drawSprites(SDL_Surface* surface, byte scanline)
 			}
 
 			line *= 2; // same as for tiles
-			dataAddress = (ADDR_VIDEO_RAM + (tileLocation * 16)) + (word)line;
+			dataAddress = (ADDR_VIDEO_RAM + (tileLocation * 16)) + (uint16_t)line;
 			data1 = readByteFromMemory(dataAddress);
 			data2 = readByteFromMemory(dataAddress + 1);
 
@@ -481,7 +476,7 @@ void drawTilemap(SDL_Surface* surface)
 {
     int xx, yy, tx, ty;
     unsigned int colour;
-    byte b1, b2;
+    uint8_t b1, b2;
 
     unsigned int tile_table;
     unsigned int bg_offset;

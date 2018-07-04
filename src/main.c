@@ -240,7 +240,7 @@ void updateTimers(Uint32 cycles)
 		// Has the timer reached it's trigger point yet?
 		if (gbState.timerPeriod <= 0)
 		{
-			byte freq = gbIO.TIMECONT & 0x03;
+			uint8_t freq = gbIO.TIMECONT & 0x03;
 			
 			// Refresh the timer
 			switch (freq)
@@ -266,9 +266,9 @@ void updateTimers(Uint32 cycles)
 	}
 }
 
-byte getJoypadState(void)
+uint8_t getJoypadState(void)
 {
-	byte state = 0x0F;
+	uint8_t state = 0x0F;
 
 	// Test for direction key check
 	if ((gbIO.JOYPAD & (1 << 4)) == 0x00)
